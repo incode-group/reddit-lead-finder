@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// directUrl використовується для міграцій (prisma migrate, db push)
+// DATABASE_URL використовується для роботи додатку (через connection pooler)
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Subreddit {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  displayName String?
+  description String?
+  posts       Post[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("subreddits")
+}
+
+model Post {
+  id          String    @id @default(uuid())
+  redditId    String    @unique
+  title       String
+  content     String    @db.Text
+  author      String
+  url         String
+  score       Int       @default(0)
+  numComments Int       @default(0)
+  createdAt   DateTime
+  isLead      Boolean   @default(false)
+  leadScore   Float?
+  subredditId String
+  subreddit   Subreddit @relation(fields: [subredditId], references: [id], onDelete: Cascade)
+  comments    Comment[]
+  leads       Lead[]
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  @@map("posts")
+}
+
+model Comment {
+  id         String    @id @default(uuid())
+  redditId   String    @unique
+  content    String    @db.Text
+  author     String
+  score      Int       @default(0)
+  createdAt  DateTime
+  isLead     Boolean   @default(false)
+  leadScore  Float?
+  postId     String
+  post       Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  leads      Lead[]
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  @@map("comments")
+}
+
+model Lead {
+  id         String   @id @default(uuid())
+  type       LeadType
+  confidence Float
+  aiReason   String?  @db.Text
+  postId     String?
+  post       Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId  String?
+  comment    Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("leads")
+}
+
+enum LeadType {
+  post
+  comment
+}
