@@ -1,7 +1,3 @@
-# Reddit Lead Finder for IT Services
-
-A tool to find potential IT service leads from Reddit posts and comments.
-
 ## Tech Stack
 
 - **Frontend**: Next.js
