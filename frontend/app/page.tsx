@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { SubredditSelector } from '@/components/subreddit-selector';
 import { StatisticsCard } from '@/components/statistics-card';
 import { LeadCard } from '@/components/lead-card';
 import { LoadingState, StatisticsSkeleton } from '@/components/loading-state';
 import { ErrorMessage } from '@/components/error-message';
-import { Separator } from '@/components/ui/separator';
+import { AnalyticsDashboard } from '@/components/analytics-dashboard';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -111,13 +112,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <div className="container mx-auto py-8 px-6 max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight mb-2">
+        <div className="mb-10">
+          <h1 className="text-3xl font-semibold tracking-tight mb-2 text-foreground">
             Reddit Lead Finder
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Discover IT service opportunities from Reddit posts and comments
           </p>
         </div>
@@ -125,7 +126,7 @@ export default function Home() {
         {/* Main Content */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Left Column - Controls */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-8 lg:self-start">
             <SubredditSelector
               subreddits={subreddits}
               onSubredditsChange={setSubreddits}
@@ -134,15 +135,15 @@ export default function Home() {
             />
 
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base font-semibold tracking-tight flex items-center gap-2">
                   <Settings2 className="h-4 w-4" />
                   Settings
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-0">
                 <div className="space-y-2">
-                  <Label htmlFor="posts-limit">Posts Limit per Subreddit</Label>
+                  <Label htmlFor="posts-limit" className="text-xs font-medium">Posts Limit</Label>
                   <Input
                     id="posts-limit"
                     type="number"
@@ -150,12 +151,14 @@ export default function Home() {
                     onChange={(e) => setPostsLimit(parseInt(e.target.value) || 25)}
                     min="1"
                     max="100"
+                    className="text-sm"
                   />
                 </div>
                 <Button
                   onClick={handleParseAndAnalyze}
                   disabled={analyzing || subreddits.length === 0}
                   className="w-full"
+                  size="sm"
                 >
                   <Search className="h-4 w-4 mr-2" />
                   {analyzing ? 'Analyzing...' : 'Parse & Analyze'}
@@ -171,22 +174,41 @@ export default function Home() {
             {analyzing && <LoadingState />}
 
             {!analyzing && statistics.length > 0 && (
-              <div>
-                <h2 className="text-2xl font-semibold mb-4">Statistics</h2>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {statistics.map((stat) => (
-                    <StatisticsCard key={stat.subreddit} stat={stat} />
-                  ))}
+              <>
+                {/* Analytics Dashboard */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <h2 className="text-lg font-semibold tracking-tight">Analytics</h2>
+                    <div className="h-px flex-1 bg-border" />
+                  </div>
+                  <AnalyticsDashboard statistics={statistics} leads={leads} />
                 </div>
-              </div>
+
+                {/* Per-Subreddit Statistics */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <h2 className="text-lg font-semibold tracking-tight">Subreddit Details</h2>
+                    <div className="h-px flex-1 bg-border" />
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {statistics.map((stat) => (
+                      <StatisticsCard key={stat.subreddit} stat={stat} />
+                    ))}
+                  </div>
+                </div>
+              </>
             )}
 
             {!analyzing && leads.length > 0 && (
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-semibold">
-                    Found Leads ({leads.length})
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <h2 className="text-lg font-semibold tracking-tight">
+                    Found Leads
                   </h2>
+                  <Badge variant="secondary" className="ml-2">
+                    {leads.length}
+                  </Badge>
+                  <div className="h-px flex-1 bg-border" />
                 </div>
                 <div className="grid gap-4">
                   {leads.map((lead) => (

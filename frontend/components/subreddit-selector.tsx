@@ -44,27 +44,29 @@ export function SubredditSelector({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Select Subreddits</CardTitle>
-        <CardDescription>
-          Choose up to {maxSubreddits} subreddits to analyze for leads
+      <CardHeader className="pb-4">
+        <CardTitle className="text-base font-semibold tracking-tight">Select Subreddits</CardTitle>
+        <CardDescription className="text-xs">
+          Choose up to {maxSubreddits} subreddits to analyze
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-0">
         <div className="space-y-2">
-          <Label htmlFor="subreddit-input">Add Subreddit</Label>
+          <Label htmlFor="subreddit-input" className="text-xs font-medium">Add Subreddit</Label>
           <div className="flex gap-2">
             <Input
               id="subreddit-input"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="e.g., webdev, forhire, startups"
+              placeholder="webdev, forhire, startups"
               disabled={subreddits.length >= maxSubreddits}
+              className="text-sm"
             />
             <Button
               onClick={() => addSubreddit(inputValue)}
               disabled={subreddits.length >= maxSubreddits || !inputValue.trim()}
+              size="sm"
             >
               Add
             </Button>
@@ -73,7 +75,7 @@ export function SubredditSelector({
 
         {suggestedSubreddits.length > 0 && (
           <div className="space-y-2">
-            <Label>Suggested Subreddits</Label>
+            <Label className="text-xs font-medium text-muted-foreground">Suggested</Label>
             <div className="flex flex-wrap gap-2">
               {suggestedSubreddits.map((sub) => (
                 <Button
@@ -82,6 +84,7 @@ export function SubredditSelector({
                   size="sm"
                   onClick={() => addSubreddit(sub)}
                   disabled={subreddits.includes(sub) || subreddits.length >= maxSubreddits}
+                  className="text-xs h-7"
                 >
                   r/{sub}
                 </Button>
@@ -92,14 +95,16 @@ export function SubredditSelector({
 
         {subreddits.length > 0 && (
           <div className="space-y-2">
-            <Label>Selected Subreddits ({subreddits.length}/{maxSubreddits})</Label>
+            <Label className="text-xs font-medium text-muted-foreground">
+              Selected ({subreddits.length}/{maxSubreddits})
+            </Label>
             <div className="flex flex-wrap gap-2">
               {subreddits.map((sub) => (
-                <Badge key={sub} variant="secondary" className="gap-1 pr-1">
+                <Badge key={sub} variant="secondary" className="gap-1.5 pr-1.5 h-7 text-xs">
                   <span>r/{sub}</span>
                   <button
                     onClick={() => removeSubreddit(sub)}
-                    className="ml-1 rounded-full hover:bg-muted p-0.5"
+                    className="ml-0.5 rounded-full hover:bg-muted-foreground/20 p-0.5 transition-colors"
                   >
                     <X className="h-3 w-3" />
                   </button>
